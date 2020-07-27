@@ -27,6 +27,7 @@ namespace NicolaPIermatteiWec
             var connectionString = Configuration.GetConnectionString("DbString");
             services.AddTransient<IDataAccess>(x => new DataAccess(connectionString));
             services.AddControllersWithViews();
+            services.AddSwaggerGen();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -42,8 +43,13 @@ namespace NicolaPIermatteiWec
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+            app.UseSwagger();
             app.UseHttpsRedirection();
             app.UseStaticFiles();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Esame Finale Nicola Piermattei");
+            });
 
             app.UseRouting();
 
