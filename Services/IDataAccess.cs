@@ -20,5 +20,6 @@ namespace NicolaPIermatteiWec.Services
         Task<List<TypeOfRelevation>> GetTypeOfRelevationsData();
         Task<ResponseModel> PositiveInsertion(PositiveInsert model);
         Task<ResultForTables> ResultForTables();
+        Task<List<MapData>> RetreiveForMap();
     }
 }

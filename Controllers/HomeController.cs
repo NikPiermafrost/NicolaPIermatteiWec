@@ -40,26 +40,38 @@ namespace NicolaPIermatteiWec.Controllers
             }
         }
 
-        public IActionResult Privacy()
+        public async Task<IActionResult> DbTables()
+        {
+            try
+            {
+                var res = await _Da.ResultForTables();
+                return View(res);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        public ActionResult Graph()
         {
             return View();
         }
 
-        public IActionResult Map()
+        [HttpPost]
+        public async Task<IActionResult> DeleteData()
         {
-            return View();
+            if (await _Da.ClearData())
+            {
+                return RedirectToAction(nameof(DbTables));
+            }
+            else
+            {
+                //Implementare pagina eccezione
+                return View();
+            }
         }
-
-        public IActionResult Chart()
-        {
-            return View();
-        }
-
-        public IActionResult Datatable()
-        {
-            return View();
-        }
-
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

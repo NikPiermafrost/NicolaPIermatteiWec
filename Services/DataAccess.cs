@@ -46,19 +46,18 @@ namespace NicolaPIermatteiWec.Services
                 if (rows > 0)
                 {
 
-                    //var findPositive = @"SELECT * FROM Positive WHERE DispoId = @DispoContactId";
-                    //var queryPositive = await _conn.QueryFirstOrDefaultAsync<Positive>(findPositive, new { model.DispoContactId });
-                    //if (queryPositive != null)
-                    //{
-                    //    var scoreForDate = ScoreForDate(queryPositive.DatePositive, DateContact);
-                    //    var scoreForProx = ScoreForProx(model.Prox);
-                    //    var Score = scoreForDate + scoreForProx;
-                    //    var DateOfRelevation = DateContact;
-
-                    //    return new ResponseModel { StatusCode = 200, Message = "Insertion executed" };
-                    //}
-                    //return new ResponseModel { StatusCode = 500, Message = "Insertion Not completed during Query" };
-                    return new ResponseModel { StatusCode = 200, Message = "Insertion executed" };
+                    var findPositive = @"SELECT * FROM Positive WHERE DispoId = @DispoContactId";
+                    var queryPositive = await _conn.QueryFirstOrDefaultAsync<PositiveTable>(findPositive, new { model.DispoContactId });
+                    if (queryPositive != null)
+                    {
+                        var scoreForDate = ScoreForDate(queryPositive.DatePositive, DateContact);
+                        var scoreForProx = ScoreForProx(model.Prox);
+                        var Score = scoreForDate + scoreForProx;
+                        var DateOfRelevation = DateContact;
+                        await _conn.ExecuteAsync("INSERT INTO Scoring (Score, DispoId, DateOfRelevation) VALUES (@Score, @DispoId, @DateOfRelevation)", new { Score, model.DispoId, DateOfRelevation});
+                        return new ResponseModel { StatusCode = 200, Message = "Insertion executed" };
+                    }
+                    return new ResponseModel { StatusCode = 500, Message = "Insertion Not completed during Query" };
                 }
                 else
                 {
@@ -167,7 +166,7 @@ namespace NicolaPIermatteiWec.Services
             var res = new ResultForTables();
             var scores = await _conn.QueryAsync<Scoring>("SELECT * FROM Scoring");
             var Daylies = await _conn.QueryAsync<DailyContact>("SELECT * FROM DailyContact");
-            var Positives = await _conn.QueryAsync<PositiveTable>("SELECT + FROM Positive");
+            var Positives = await _conn.QueryAsync<PositiveTable>("SELECT * FROM Positive");
             res.Scorings = scores.ToList();
             res.DailyContacts = Daylies.ToList();
             res.PositiveTables = Positives.ToList();
@@ -178,7 +177,7 @@ namespace NicolaPIermatteiWec.Services
         {
             try
             {
-                var query = @"DELETE FROM Positives
+                var query = @"DELETE FROM Positive
                           DELETE FROM DailyContact DBCC CHECKIDENT('DailyContact',RESEED, 0)
                           DELETE FROM Scoring DBCC CHECKIDENT('Scoring', RESEED, 0)";
                 await _conn.ExecuteAsync(query);
@@ -188,6 +187,19 @@ namespace NicolaPIermatteiWec.Services
             {
                 return false;
             }
+        }
+
+        public async Task<List<MapData>> RetreiveForMap()
+        {
+            var TwoWeeksAgo = DateTime.Now.AddDays(-15).Date;
+            var query = @"SELECT COUNT(*) AS HowMany, Province, Latitude, Longitude
+                            FROM DailyContact AS DC
+                            JOIN Positive AS P ON P.DispoId = DC.DispoContactId
+                            JOIN Scoring AS S ON P.DispoId = S.DispoId
+                            WHERE S.Score >= 7 AND Dc.DateContact > @TwoWeeksAgo AND P.DatePositive <= DC.DateContact
+                            GROUP BY DC.Province, Dc.Latitude, Dc.Longitude";
+            var res = await _conn.QueryAsync<MapData>(query, new { TwoWeeksAgo });
+            return res.ToList();
         }
 
         private int ScoreForDate(DateTime firstDate, DateTime secondDate)
