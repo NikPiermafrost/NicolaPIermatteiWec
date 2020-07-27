@@ -30,5 +30,18 @@ namespace NicolaPIermatteiWec.Controllers
                 return StatusCode(500, "There was an error on retreiving the data");
             }
         }
+
+        [HttpGet("Graph")]
+        public async Task<IActionResult> GetData()
+        {
+            try
+            {
+                return Ok(await _dataAccess.GetGraphData());
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, "There was an error on retreiving the data");
+            }
+        }
     }
 }

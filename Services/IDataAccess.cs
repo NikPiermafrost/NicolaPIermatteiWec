@@ -15,6 +15,7 @@ namespace NicolaPIermatteiWec.Services
         void Dispose();
         DbConnection GetConnection();
         Task<List<DistanceByProvince>> GetDistanceByProvinceTableData();
+        Task<List<List<GraphData>>> GetGraphData();
         Task<List<TopTenByScore>> GetTopTenByScoresData();
         Task<List<TopTenDevicesByContact>> GetTopTenDevicesData();
         Task<List<TypeOfRelevation>> GetTypeOfRelevationsData();

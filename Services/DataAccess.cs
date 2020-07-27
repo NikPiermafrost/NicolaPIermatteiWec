@@ -202,6 +202,37 @@ namespace NicolaPIermatteiWec.Services
             return res.ToList();
         }
 
+        public async Task<List<List<GraphData>>> GetGraphData()
+        {
+            var minDate = await _conn.QueryFirstOrDefaultAsync<string>("SELECT TOP 1 CAST(DateContact AS nvarchar) FROM DailyContact ORDER BY DateContact");
+            var oldestDate = DateTime.Parse(minDate);
+            var Provinces = await _conn.QueryAsync<string>("SELECT DISTINCT Province FROM DailyContact");
+            var res = new List<List<GraphData>>();
+            foreach (var item in Provinces)
+            {
+                var tmpList = new List<GraphData>();
+                var query = @"SELECT CAST(P.DatePositive AS date) AS DateEvent, COUNT (*) AS HowMany
+                            FROM DailyContact AS D
+                            RIGHT JOIN Positive AS P ON CAST(P.DatePositive AS DATE) = CAST(D.DateContact AS DATE)
+                            WHERE Province = @item
+                            GROUP BY CAST(P.DatePositive AS date)";
+                var resProvince = await _conn.QueryAsync<GraphData>(query, new { item });
+                var cntMax = DateTime.Now.Date - oldestDate.Date;
+                var cnt = (int)cntMax.TotalDays;
+                for (int i = 0; i < cnt; i++)
+                {
+                    var tmp = new GraphData();
+                    tmp.Province = item;
+                    tmp.DateEvent = DateTime.Now.AddDays(-i);
+                    var howMany = resProvince.FirstOrDefault(x => x.DateEvent.Date == tmp.DateEvent.Date);
+                    tmp.HowMany = howMany == null ? 0 : howMany.HowMany;
+                    tmpList.Add(tmp);
+                }
+                res.Add(tmpList);
+            }
+            return res;
+        }
+
         private int ScoreForDate(DateTime firstDate, DateTime secondDate)
         {
             int diff = (int)(firstDate.Date - secondDate.Date).TotalDays;

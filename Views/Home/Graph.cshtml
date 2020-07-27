@@ -1,0 +1,115 @@
+﻿<div class="container">
+    <div class="card mb-5">
+        <div class="card-header">
+            Mappa Delle ultime due settimane
+        </div>
+        <div class="card-body">
+            <div id="mapid" style="height: 50vh"></div>
+        </div>
+    </div>
+    <div class="card mb-5">
+        <div class="card-header">
+            Mappa Delle ultime due settimane
+        </div>
+        <div class="card-body">
+            <canvas id="canvas" style="height: 50vh"></canvas>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        fetch('/api/graphandmap/map')
+            .then(x => x.json(), error => console.log(error))
+            .then(data => {
+                if (data.length > 0) {
+
+                    var mymap = L.map('mapid').setView([data[0].latitude, data[0].longitude], 8);
+
+                    L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+                        maxZoom: 18,
+                        attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
+                            '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+                            'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+                        id: 'mapbox/streets-v11',
+                        tileSize: 512,
+                        zoomOffset: -1
+                    }).addTo(mymap);
+
+                    for (var item of data) {
+                        L.marker([item.latitude, item.longitude]).addTo(mymap)
+                            .bindPopup("Provincia di " + item.province + ", Contatti a rischio: " + item.howMany);
+
+                        L.circle([item.latitude, item.longitude], item.howMany * 1000, {
+                            color: 'red',
+                            fillColor: '#f03',
+                            fillOpacity: 0.5
+                        }).addTo(mymap);
+                    }
+                }
+            });
+    </script>
+    <script>
+        fetch('/api/graphandmap/graph')
+            .then(x => x.json(), error => console.log(error))
+            .then(data => {
+                console.log(data);
+                var datasets = data.map(x => {
+                    return {
+                        label: x[0].province,
+                        data: x.map(x => x.howMany),
+                        borderColor: getRandomColor(),
+                        backgroundColor: 'rgb(0,0,0,0)'
+                    };
+                });
+                console.log(datasets);
+                var config = {
+                    type: 'line',
+                    data: {
+                        labels: data[0].map(x => x.dateParsed),
+                        datasets: datasets
+                    },
+                    options: {
+                        responsive: true,
+                        tooltips: {
+                            mode: 'index',
+                            intersect: false,
+                        },
+                        hover: {
+                            mode: 'nearest',
+                            intersect: true
+                        },
+                        scales: {
+                            xAxes: [{
+                                display: true,
+                                scaleLabel: {
+                                    display: true,
+                                    labelString: 'Month'
+                                }
+                            }],
+                            yAxes: [{
+                                display: true,
+                                scaleLabel: {
+                                    display: true,
+                                    labelString: 'Value'
+                                }
+                            }]
+                        }
+                    }
+                };
+
+
+                var ctx = document.getElementById('canvas').getContext('2d');
+                window.myLine = new Chart(ctx, config);
+            });
+
+        function getRandomColor() {
+            var letters = '0123456789ABCDEF';
+            var color = '#';
+            for (var i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+    </script>
+}
