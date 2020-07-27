@@ -21,9 +21,9 @@ namespace NicolaPIermatteiWec.Controllers
         }
 
         [HttpPost("Daily")]
-        [ProducesResponseType(typeof(DailyInsert), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(DailyInsert), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(DailyInsert), StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(typeof(ResponseModel), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ResponseModel), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ResponseModel), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> InsertContact(DailyInsert model)
         {
             var response = new ResponseModel();
@@ -53,9 +53,9 @@ namespace NicolaPIermatteiWec.Controllers
         }
 
         [HttpPost("Positive")]
-        [ProducesResponseType(typeof(DailyInsert), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(DailyInsert), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(DailyInsert), StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(typeof(ResponseModel), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ResponseModel), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ResponseModel), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> InsertPositive(PositiveInsert model)
         {
             var response = new ResponseModel();

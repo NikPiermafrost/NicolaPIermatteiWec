@@ -13,7 +13,8 @@ namespace NicolaPIermatteiWec.Models.InsertModels
         [Required]
         public string DispoContactId { get; set; }
         [Required]
-        public int Prox { get; set; }
+        [Range(0, float.MaxValue)]
+        public float Prox { get; set; }
         [Required]
         public string Province { get; set; }
         [Required]
