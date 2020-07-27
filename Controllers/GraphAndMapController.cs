@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using NicolaPIermatteiWec.Models.ViewModels;
 using NicolaPIermatteiWec.Services;
 
 namespace NicolaPIermatteiWec.Controllers
@@ -19,6 +20,8 @@ namespace NicolaPIermatteiWec.Controllers
         }
 
         [HttpGet("Map")]
+        [ProducesResponseType(typeof(List<MapData>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetMap()
         {
             try
@@ -32,6 +35,8 @@ namespace NicolaPIermatteiWec.Controllers
         }
 
         [HttpGet("Graph")]
+        [ProducesResponseType(typeof(List<List<GraphData>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetData()
         {
             try
