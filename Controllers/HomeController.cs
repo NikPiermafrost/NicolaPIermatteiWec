@@ -35,8 +35,7 @@ namespace NicolaPIermatteiWec.Controllers
             }
             catch (Exception)
             {
-
-                throw;
+                return RedirectToAction(nameof(ErrorPage), new ErrorModel { Error = "Non è stato possibile caricare i dati" });
             }
         }
 
@@ -49,12 +48,16 @@ namespace NicolaPIermatteiWec.Controllers
             }
             catch (Exception)
             {
-
-                throw;
+                return RedirectToAction(nameof(ErrorPage), new ErrorModel { Error = "Non è stato possibile effettuare caricare i dati" });
             }
         }
 
-        public ActionResult Graph()
+        public IActionResult Graph()
+        {
+            return View();
+        }
+
+        public IActionResult ErrorPage()
         {
             return View();
         }
@@ -68,15 +71,8 @@ namespace NicolaPIermatteiWec.Controllers
             }
             else
             {
-                //Implementare pagina eccezione
-                return View();
+                return RedirectToAction(nameof(ErrorPage), new ErrorModel { Error = "Non è stato possibile effettuare il reseed del database"});
             }
-        }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
 }
