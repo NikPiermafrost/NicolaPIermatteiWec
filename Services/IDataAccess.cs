@@ -7,8 +7,9 @@ namespace NicolaPIermatteiWec.Services
 {
     public interface IDataAccess
     {
-        Task<DailyResponseModel> DailyInsertion(DailyInsert model);
+        Task<ResponseModel> DailyInsertion(DailyInsert model);
         void Dispose();
         DbConnection GetConnection();
+        Task<ResponseModel> PositiveInsertion(PositiveInsert model);
     }
 }

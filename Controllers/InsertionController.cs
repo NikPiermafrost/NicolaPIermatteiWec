@@ -23,7 +23,7 @@ namespace NicolaPIermatteiWec.Controllers
         [HttpPost("Daily")]
         public async Task<IActionResult> InsertContact(DailyInsert model)
         {
-            var response = new DailyResponseModel();
+            var response = new ResponseModel();
             try
             {
                 if (ModelState.IsValid && model.Latitude != 0 && model.Longitude != 0)
@@ -35,6 +35,29 @@ namespace NicolaPIermatteiWec.Controllers
                 {
                     response.StatusCode = 400;
                     response.Message = "Latitude and Longitude are 0, the data in invalid";
+                    return StatusCode(response.StatusCode, response);
+                }
+                response.StatusCode = 400;
+                response.Message = "One or more fields are not correct";
+                return StatusCode(response.StatusCode, response);
+            }
+            catch (Exception ex)
+            {
+                response.StatusCode = 500;
+                response.Message = ex.Message;
+                return StatusCode(response.StatusCode, response);
+            }
+        }
+
+        [HttpPost("Positive")]
+        public async Task<IActionResult> InsertPositive(PositiveInsert model)
+        {
+            var response = new ResponseModel();
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    response = await _da.PositiveInsertion(model);
                     return StatusCode(response.StatusCode, response);
                 }
                 response.StatusCode = 400;

@@ -32,7 +32,7 @@ namespace NicolaPIermatteiWec.Services
             _conn.Dispose();
         }
 
-        public async Task<DailyResponseModel> DailyInsertion(DailyInsert model)
+        public async Task<ResponseModel> DailyInsertion(DailyInsert model)
         {
             try
             {
@@ -43,16 +43,39 @@ namespace NicolaPIermatteiWec.Services
                 var rows = await _conn.ExecuteAsync(query, new { model.DispoContactId, model.DispoId, model.Prox, model.Province, model.Latitude, model.Longitude, model.Distance, DateContact });
                 if (rows > 0)
                 {
-                    return new DailyResponseModel { StatusCode = 200, Message = "Insertion executed" };
+                    return new ResponseModel { StatusCode = 200, Message = "Insertion executed" };
                 }
                 else
                 {
-                    return new DailyResponseModel { StatusCode = 500, Message = "Insertion Not completed during Query" };
+                    return new ResponseModel { StatusCode = 500, Message = "Insertion Not completed during Query" };
                 }
             }
             catch (Exception ex)
             {
-                return new DailyResponseModel { StatusCode = 500, Message = ex.Message};
+                return new ResponseModel { StatusCode = 500, Message = ex.Message};
+            }
+        }
+        public async Task<ResponseModel> PositiveInsertion(PositiveInsert model)
+        {
+            try
+            {
+                var query = @"
+                    INSERT INTO [Positive] (DispoId, Positive, DatePositive)
+                    VALUES (@DispoId, @Positive, @DatePositive)";
+                var DatePositive = DateTime.Parse(model.DatePositive);
+                var rows = await _conn.ExecuteAsync(query, new { model.DispoId, model.Positive, DatePositive });
+                if (rows > 0)
+                {
+                    return new ResponseModel { StatusCode = 200, Message = "Insertion executed" };
+                }
+                else
+                {
+                    return new ResponseModel { StatusCode = 500, Message = "Insertion Not completed during Query" };
+                }
+            }
+            catch (Exception ex)
+            {
+                return new ResponseModel { StatusCode = 500, Message = ex.Message };
             }
         }
     }
