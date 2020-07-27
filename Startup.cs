@@ -24,8 +24,8 @@ namespace NicolaPIermatteiWec
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            //var connectionString = Configuration.GetConnectionString("DbString");
-            //services.AddTransient<IDataAccess>(x => new DataAccess(connectionString));
+            var connectionString = Configuration.GetConnectionString("DbString");
+            services.AddTransient<IDataAccess>(x => new DataAccess(connectionString));
             services.AddControllersWithViews();
         }
 

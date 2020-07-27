@@ -13,6 +13,6 @@ namespace NicolaPIermatteiWec.Models.InsertModels
         [Required]
         public bool Positive { get; set; }
         [Required]
-        public DateTime DatePositive { get; set; }
+        public string DatePositive { get; set; }
     }
 }

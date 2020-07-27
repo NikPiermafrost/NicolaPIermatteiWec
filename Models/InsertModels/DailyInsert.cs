@@ -9,22 +9,22 @@ namespace NicolaPIermatteiWec.Models.InsertModels
     public class DailyInsert
     {
         [Required]
-        [MaxLength(50)]
         public string DispoId { get; set; }
         [Required]
-        [MaxLength(50)]
         public string DispoContactId { get; set; }
         [Required]
         public int Prox { get; set; }
         [Required]
         public string Province { get; set; }
         [Required]
+        [Range(-90, 90)]
         public float Latitude { get; set; }
         [Required]
+        [Range(-90, 90)]
         public float Longitude { get; set; }
         [Required]
         public int Distance { get; set; }
         [Required]
-        public DateTime DateContacts{ get; set; }
+        public string DateContact { get; set; }
     }
 }
