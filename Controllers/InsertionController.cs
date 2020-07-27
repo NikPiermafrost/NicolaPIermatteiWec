@@ -77,5 +77,55 @@ namespace NicolaPIermatteiWec.Controllers
                 return StatusCode(response.StatusCode, response);
             }
         }
+
+        [HttpPost("BulkInsert")]
+        [ProducesResponseType(typeof(ResponseModel), StatusCodes.Status200OK)]
+        public async Task<IActionResult> BulkInsert(BulkInsert model)
+        {
+            var res = new BulkInsertResponse();
+            res.DailyInserted = new List<DailyInsert>();
+            res.DailyNotInserted = new List<DailyInsert>();
+            res.PositiveNotInserted = new List<PositiveInsert>();
+            res.PositiveInserted = new List<PositiveInsert>();
+            foreach (var item in model.DailyInserts)
+            {
+                if (ModelState.IsValid)
+                {
+                    var dailyRes = await _da.DailyInsertion(item);
+                    if (dailyRes.StatusCode == 200)
+                    {
+                        res.DailyInserted.Add(item);
+                    }
+                    else
+                    {
+                        res.DailyNotInserted.Add(item);
+                    }
+                }
+                else
+                {
+                    res.DailyNotInserted.Add(item);
+                }
+            }
+            foreach (var item in model.PositiveInserts)
+            {
+                if (ModelState.IsValid)
+                {
+                    var dailyRes = await _da.PositiveInsertion(item);
+                    if (dailyRes.StatusCode == 200)
+                    {
+                        res.PositiveInserted.Add(item);
+                    }
+                    else
+                    {
+                        res.PositiveNotInserted.Add(item);
+                    }
+                }
+                else
+                {
+                    res.PositiveNotInserted.Add(item);
+                }
+            }
+            return Ok(res);
+        }
     }
 }
