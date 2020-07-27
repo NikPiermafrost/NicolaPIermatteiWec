@@ -87,25 +87,6 @@ namespace NicolaPIermatteiWec.Controllers
             res.DailyNotInserted = new List<DailyInsert>();
             res.PositiveNotInserted = new List<PositiveInsert>();
             res.PositiveInserted = new List<PositiveInsert>();
-            foreach (var item in model.DailyInserts)
-            {
-                if (ModelState.IsValid)
-                {
-                    var dailyRes = await _da.DailyInsertion(item);
-                    if (dailyRes.StatusCode == 200)
-                    {
-                        res.DailyInserted.Add(item);
-                    }
-                    else
-                    {
-                        res.DailyNotInserted.Add(item);
-                    }
-                }
-                else
-                {
-                    res.DailyNotInserted.Add(item);
-                }
-            }
             foreach (var item in model.PositiveInserts)
             {
                 if (ModelState.IsValid)
@@ -123,6 +104,25 @@ namespace NicolaPIermatteiWec.Controllers
                 else
                 {
                     res.PositiveNotInserted.Add(item);
+                }
+            }
+            foreach (var item in model.DailyInserts)
+            {
+                if (ModelState.IsValid)
+                {
+                    var dailyRes = await _da.DailyInsertion(item);
+                    if (dailyRes.StatusCode == 200)
+                    {
+                        res.DailyInserted.Add(item);
+                    }
+                    else
+                    {
+                        res.DailyNotInserted.Add(item);
+                    }
+                }
+                else
+                {
+                    res.DailyNotInserted.Add(item);
                 }
             }
             return Ok(res);

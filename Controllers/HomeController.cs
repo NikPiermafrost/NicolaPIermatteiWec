@@ -6,21 +6,28 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using NicolaPIermatteiWec.Models;
+using NicolaPIermatteiWec.Models.ViewModels;
+using NicolaPIermatteiWec.Services;
 
 namespace NicolaPIermatteiWec.Controllers
 {
     public class HomeController : Controller
     {
+        private readonly IDataAccess _Da;
         private readonly ILogger<HomeController> _logger;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, IDataAccess dataAccess)
         {
             _logger = logger;
+            _Da = dataAccess;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            var res = new FirstPageModel();
+            res.DistanceByProvinces = await _Da.GetDistanceByProvinceTableData();
+            res.TypeOfRelevations = await _Da.GetTypeOfRelevationsData();
+            return View(res);
         }
 
         public IActionResult Privacy()
