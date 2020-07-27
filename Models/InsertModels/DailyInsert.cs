@@ -9,6 +9,7 @@ namespace NicolaPIermatteiWec.Models.InsertModels
     public class DailyInsert
     {
         [Required]
+        [MaxLength(256)]
         public string DispoId { get; set; }
         [Required]
         public string DispoContactId { get; set; }
