@@ -9,5 +9,7 @@ namespace NicolaPIermatteiWec.Models.ViewModels
     {
         public List<DistanceByProvince> DistanceByProvinces { get; set; }
         public List<TypeOfRelevation> TypeOfRelevations { get; set; }
+        public List<TopTenByScore> TopTenByScores { get; set; }
+        public List<TopTenDevicesByContact> TopTenDevices { get; set; }
     }
 }

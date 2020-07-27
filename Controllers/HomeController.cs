@@ -22,12 +22,22 @@ namespace NicolaPIermatteiWec.Controllers
             _Da = dataAccess;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Tables()
         {
-            var res = new FirstPageModel();
-            res.DistanceByProvinces = await _Da.GetDistanceByProvinceTableData();
-            res.TypeOfRelevations = await _Da.GetTypeOfRelevationsData();
-            return View(res);
+            try
+            {
+                var res = new FirstPageModel();
+                res.DistanceByProvinces = await _Da.GetDistanceByProvinceTableData();
+                res.TypeOfRelevations = await _Da.GetTypeOfRelevationsData();
+                res.TopTenDevices = await _Da.GetTopTenDevicesData();
+                res.TopTenByScores = await _Da.GetTopTenByScoresData();
+                return View(res);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
 
         public IActionResult Privacy()

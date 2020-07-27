@@ -8,6 +8,7 @@ using System.Data.Common;
 using NicolaPIermatteiWec.Models;
 using NicolaPIermatteiWec.Models.InsertModels;
 using NicolaPIermatteiWec.Models.ViewModels;
+using NicolaPIermatteiWec.Models.DbModels;
 
 namespace NicolaPIermatteiWec.Services
 {
@@ -126,7 +127,10 @@ namespace NicolaPIermatteiWec.Services
                             (SELECT COUNT(*)
                             FROM DailyContact as D
                             JOIN Positive AS P ON P.DispoId = D.DispoContactId
-                            WHERE P.Positive = 1 AND P.DatePositive > CAST('2020-06-27' AS datetime2) AND D.Province = DC.Province) AS NumberOfPositives,
+                            WHERE P.Positive = 1 
+							AND P.DatePositive > CAST('2020-06-27' AS datetime2) 
+							AND D.Province = DC.Province
+							AND (SELECT MIN(DatePositive) FROM Positive WHERE D.DispoContactId = DispoId) <= D.DateContact) AS NumberOfPositives,
                             (SELECT COUNT (*)
                             FROM DailyContact as Dalt
                             JOIN Positive AS Palt ON Palt.DispoId = Dalt.DispoContactId
@@ -137,6 +141,53 @@ namespace NicolaPIermatteiWec.Services
                             GROUP BY DC.Province";
             var res = await _conn.QueryAsync<TypeOfRelevation>(query, new { LastMonth });
             return res.ToList();
+        }
+
+        public async Task<List<TopTenDevicesByContact>> GetTopTenDevicesData()
+        {
+            var query = @"SELECT TOP(10) DC.DispoId, COUNT (*) AS HowMany
+                          FROM DailyContact AS DC
+                          GROUP BY DC.DispoId
+                          ORDER BY HowMany DESC";
+            var res = await _conn.QueryAsync<TopTenDevicesByContact>(query);
+            return res.ToList();
+        }
+
+        public async Task<List<TopTenByScore>> GetTopTenByScoresData()
+        {
+            var query = @"SELECT TOP(10) S.DispoId, SUM(S.Score) AS Score
+                        FROM Scoring as S
+                        GROUP BY S.DispoId
+                        ORDER BY Score DESC";
+            var res = await _conn.QueryAsync<TopTenByScore>(query);
+            return res.ToList();
+        }
+        public async Task<ResultForTables> ResultForTables()
+        {
+            var res = new ResultForTables();
+            var scores = await _conn.QueryAsync<Scoring>("SELECT * FROM Scoring");
+            var Daylies = await _conn.QueryAsync<DailyContact>("SELECT * FROM DailyContact");
+            var Positives = await _conn.QueryAsync<PositiveTable>("SELECT + FROM Positive");
+            res.Scorings = scores.ToList();
+            res.DailyContacts = Daylies.ToList();
+            res.PositiveTables = Positives.ToList();
+            return res;
+        }
+
+        public async Task<bool> ClearData()
+        {
+            try
+            {
+                var query = @"DELETE FROM Positives
+                          DELETE FROM DailyContact DBCC CHECKIDENT('DailyContact',RESEED, 0)
+                          DELETE FROM Scoring DBCC CHECKIDENT('Scoring', RESEED, 0)";
+                await _conn.ExecuteAsync(query);
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
 
         private int ScoreForDate(DateTime firstDate, DateTime secondDate)
